@@ -44,7 +44,7 @@ function Post(props) {
   const isInitialMount = useRef(true);
 
   const refleshComments = useCallback(() => {
-    fetch("http://localhost:8080/comments?" + postId)
+    fetch("http://localhost:8080/comments?" + postId)//ttıutuıtıu
       .then((res) => res.json())
       .then(
         (result) => {
