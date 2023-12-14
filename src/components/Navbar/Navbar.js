@@ -10,7 +10,11 @@ function Navbar() {
   let userId = 5;
 
   return (
-    <AppBar position="static">
+    <AppBar position="static"  sx={{
+        backgroundImage: "linear-gradient(to right, #818f00, #058f00)",
+       
+        color: "white",
+      }}>
       <Toolbar>
         <IconButton
           size="large"

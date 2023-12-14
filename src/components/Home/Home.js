@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from "react";
-import Container from "@mui/material/Container";
 import Post from "../Post/Post";
+import PostForm from "../Post/PostForm";
 
 function Home() {
   const [error, setError] = useState(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [postList, setPostList] = useState([]);
-  
 
-  useEffect(() => {
+  const refleshPosts = () => {
     fetch("http://localhost:8080/posts")
       .then((res) => res.json())
       .then(
@@ -21,7 +20,11 @@ function Home() {
           setError(error);
         }
       );
-  }, []);
+  };
+
+  useEffect(() => {
+    refleshPosts();
+  }, [postList]);
 
   if (error) {
     return <div>Error!!!</div>;
@@ -29,15 +32,14 @@ function Home() {
     return <div>Loading...</div>;
   } else {
     return (
-        <div className="container" sx={{ display: "flex", flexWrap: "wrap", justifyContent: "center", alignItems: "center" }}>
-        <Container fixed sx={{ backgroundColor: "#e6ffe6", height: "100vh", paddingTop: "20px" }}>
-      
-
-  {postList.map((post) => (
-    <Post userId={post.userId} userName={post.userName} title={post.title} text={post.text}/>
-  ))}
-</Container>
-
+      <div style={{ backgroundColor: "#edede6", width: "170vh", margin: "auto" }}>
+        <PostForm userId={1} userName={"ExampleUser"} refleshPosts={refleshPosts} style={{ margin: "20px" }} />
+        {postList.map((post, index) => (
+          <React.Fragment key={post.id}>
+            <div style={{ margin: "20px" }}></div>
+            <Post likes={post.postLikes} postId={post.id} userId={post.userId} userName={post.userName} title={post.title} text={post.text} style={{ margin: "20px" }} />
+          </React.Fragment>
+        ))}
       </div>
     );
   }
