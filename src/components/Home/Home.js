@@ -1,14 +1,22 @@
 import React, { useEffect, useState } from "react";
 import Post from "../Post/Post";
 import PostForm from "../Post/PostForm";
-
 function Home() {
   const [error, setError] = useState(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [postList, setPostList] = useState([]);
 
+
   const refleshPosts = () => {
-    fetch("http://localhost:8080/posts")
+    //  const token = localStorage.getItem('tokenKey');
+
+    fetch("http://localhost:8080/posts", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        // "Authorization": `Bearer ${token}`,
+      },
+    })
       .then((res) => res.json())
       .then(
         (result) => {
@@ -17,17 +25,19 @@ function Home() {
         },
         (error) => {
           setIsLoaded(true);
+          console.error("Fetch error:", error);
           setError(error);
         }
       );
   };
 
   useEffect(() => {
-    refleshPosts();
-  }, [postList]);
+    refleshPosts();                                     //   <=== SORUN BURADA
+  }, []);
+
 
   if (error) {
-    return <div>Error!!!</div>;
+    return <div>Errorsorun!!!</div>;
   } else if (!isLoaded) {
     return <div>Loading...</div>;
   } else {

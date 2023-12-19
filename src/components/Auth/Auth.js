@@ -8,13 +8,14 @@ import {
   Paper,
   FormHelperText,
 } from "@mui/material";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 
 function Auth() {
-    const [userName, setUserName] =useState("");
-    const [password, setPassword] =useState("");
-  const [isRegistered, setIsRegistered] = useState(false);
+  const [userName, setUserName] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
+
   const sendRequest = (path) => {
     fetch(`http://localhost:8080/auth/${path}`, {
       method: "POST",
@@ -26,43 +27,50 @@ function Auth() {
         password: password,
       }),
     })
-      .then((res) => {
-        console.log("Response status:", res.status);
-        return res.json();
-      })
-      .then((result) => {
-        console.log("Response data:", result);
-        localStorage.setItem("tokenKey", result.message);
-        localStorage.setItem("currentUser", result.userId);
-        localStorage.setItem("userName", userName);
-      })
-      .catch((err) => console.error("Error:", err));
+    .then((res) => {
+      console.log("Response status:", res.status);
+    
+      if (!res.ok) {
+        throw new Error("Authentication failed");
+      }
+    
+      return res.json();
+    })
+    .then((result) => {
+      console.log("Response data:", result);
+    
+      // Eğer result undefined veya null ise, JSON formatında beklenen bir veri gelmemiş olabilir.
+      if (!result) {
+        throw new Error("Invalid JSON format in the response");
+      }
+    
+      localStorage.setItem("tokenKey", result.message);
+      localStorage.setItem("currentUser", result.userId);
+      localStorage.setItem("userName", userName);
+    
+      navigate("/");
+    })
+   // .then((res) => res.text())  // Yanıtı metin olarak al
+    .catch((err) => {
+      console.error("Error:", err);
+      setError("Authentication failed. Please check your credentials.");
+    });
+    
   };
-  
-  
 
-  const handleUsername =(value)=>{
+  const handleUsername = (value) => {
     setUserName(value);
-  }
+  };
 
-  const handlePassword =(value)=>{
+  const handlePassword = (value) => {
     setPassword(value);
-  }
+  };
 
-  const handleRegister =()=>{
-    sendRequest("register")
-    setUserName("")
-    setPassword("")
-   // history.go("/auth")
-    navigate("/auth")
-  }
-  const handleLogin =()=>{
-    sendRequest("Login")
-    setUserName("")
+  const handleButton = (path) => {
+    sendRequest(path);
+    setUserName("");
     setPassword("");
-  }
-
-  
+  };
 
   return (
     <Paper
@@ -97,21 +105,24 @@ function Auth() {
         variant="contained"
         color="primary"
         fullWidth
-        onClick={handleLogin}
+        onClick={() => handleButton("login")}
         style={{ marginTop: "16px" }}
       >
         Login
       </Button>
+      {error && (
+        <Typography color="error" style={{ marginTop: "16px" }}>
+          {error}
+        </Typography>
+      )}
       <FormHelperText style={{ margin: "20px" }}>
         Don't have an account?{" "}
-        <Button color="primary" onClick={handleRegister}>
+        <Button color="primary" onClick={() => handleButton("register")}>
           Register
         </Button>
       </FormHelperText>
     </Paper>
-    
   );
-  
 }
 
 export default Auth;
