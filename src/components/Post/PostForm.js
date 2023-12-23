@@ -34,11 +34,10 @@ function PostForm(props) {
 
 
   const savePost = () => {
-    fetch("http://localhost:8080/posts",
-    {
+    fetch("http://localhost:8080/posts", {
       method: "POST",
       headers: {
-        "Content-Type" :"application/json",
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         title: title,
@@ -46,9 +45,21 @@ function PostForm(props) {
         text: text,
       }),
     })
-    .then((res) =>res.json())
-    .then((err) =>console.log("error"))
-  }
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error("Post request failed");
+        }
+        return res.json();
+      })
+      .then((data) => {
+        console.log("Server Response:", data);
+        refleshPosts();
+      })
+      .catch((err) => {
+        console.error("Error during post request:", err);
+      });
+  };
+  
 
   const handleSubmit = () => {
     savePost();
@@ -58,6 +69,7 @@ function PostForm(props) {
     refleshPosts();
    
   }
+  
   const handleTitle = (value) => {
     setTitle(value);
     setIsSent(false);

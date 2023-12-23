@@ -179,7 +179,7 @@ function Post(props) {
             ) : isLoaded ? (
               commentList.map((comment) => (
                 <Comment
-                  key={comment.id} // Benzersiz anahtar ekledim
+                  key={comment.id} 
                   userId={1}
                   userName={"USER"}
                   text={comment.text}

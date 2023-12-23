@@ -11,12 +11,20 @@ import {
 import { useNavigate } from "react-router-dom";
 
 function Auth() {
-  const [userName, setUserName] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  const sendRequest = (path) => {
+  const handleUsername = (value) => {
+    setUsername(value);
+  };
+
+  const handlePassword = (value) => {
+    setPassword(value);
+  };
+
+  /*const handleButton = (path) => {
     fetch(`http://localhost:8080/auth/${path}`, {
       method: "POST",
       headers: {
@@ -27,50 +35,72 @@ function Auth() {
         password: password,
       }),
     })
-    .then((res) => {
-      console.log("Response status:", res.status);
-    
-      if (!res.ok) {
-        throw new Error("Authentication failed");
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("Server Response:", data);
+
+        if (data.message && typeof data.message === "string") {
+          console.log("Received JWT Token:", data.message);
+          localStorage.setItem("token", data.message);
+
+           navigate('/');
+
+        } else {
+          console.error("Received JWT is not in valid string format.");
+          setError("Login failed. Please check your credentials.");
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        setError("An unexpected error occurred.");
+      });
+  };*/
+
+
+
+
+ // ...
+
+const handleButton = (path) => {
+  fetch(`http://localhost:8080/auth/${path}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      username: username,
+      password: password,
+    }),
+  })
+    .then(async (response) => {
+      const responseData = await response.json();
+
+      console.log("Server Response:", responseData);
+
+      try {
+        const { message, userId } = responseData;
+        console.log("Received JWT Token:", message);
+        console.log("User ID:", userId);
+
+        localStorage.setItem("token", message);
+
+        // Anasayfaya yönlendir
+        navigate('/');
+
+      } catch (error) {
+        console.error("Error parsing response as JSON:", error);
+        setError("An unexpected error occurred.");
       }
-    
-      return res.json();
     })
-    .then((result) => {
-      console.log("Response data:", result);
-    
-      // Eğer result undefined veya null ise, JSON formatında beklenen bir veri gelmemiş olabilir.
-      if (!result) {
-        throw new Error("Invalid JSON format in the response");
-      }
-    
-      localStorage.setItem("tokenKey", result.message);
-      localStorage.setItem("currentUser", result.userId);
-      localStorage.setItem("userName", userName);
-    
-      navigate("/");
-    })
-   // .then((res) => res.text())  // Yanıtı metin olarak al
     .catch((err) => {
-      console.error("Error:", err);
-      setError("Authentication failed. Please check your credentials.");
+      console.log(err);
+      setError("An unexpected error occurred.");
     });
-    
-  };
+};
 
-  const handleUsername = (value) => {
-    setUserName(value);
-  };
+// ...
 
-  const handlePassword = (value) => {
-    setPassword(value);
-  };
-
-  const handleButton = (path) => {
-    sendRequest(path);
-    setUserName("");
-    setPassword("");
-  };
+  
 
   return (
     <Paper
@@ -88,7 +118,7 @@ function Auth() {
         <InputLabel htmlFor="username">Username</InputLabel>
         <Input
           id="username"
-          value={userName}
+          value={username}
           onChange={(i) => handleUsername(i.target.value)}
         />
       </FormControl>

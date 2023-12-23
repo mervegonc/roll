@@ -9,12 +9,12 @@ import { LockOpen } from "@mui/icons-material";
 
 function Navbar() {
   const navigate = useNavigate();
-
   const onClick = () => {
+    
     localStorage.removeItem("tokenKey")
     localStorage.removeItem("currentUser")
     localStorage.removeItem("userName")
-    navigate(0) // Doğru şekilde useNavigate hook'unu kullanın
+    navigate('/') 
   };
 
   return (
@@ -37,9 +37,7 @@ function Navbar() {
         </Typography>
         <Typography variant="h6" component="div">
           {localStorage.getItem("currentUser") == null ? 
-            <Link to="/auth" style={{ textDecoration: 'none', color: 'white', boxShadow: 'none' }}>Login/Register</Link>
-            
-           : 
+            <Link to="/auth" style={{ textDecoration: 'none', color: 'white', boxShadow: 'none' }}>Login/Register</Link> : 
             <div>
               <IconButton onClick={onClick}><LockOpen /></IconButton>
               <Link to={{ pathname: '/users/'+localStorage.getItem("currentUser")}} 
